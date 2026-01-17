@@ -68,3 +68,13 @@ apt-get update
 apt-get install --assume-yes containerd.io
 
 echo "Containerd installed successfully."
+
+# Configure containerd for Systemd cgroups
+echo "Configuring containerd..."
+mkdir -p /etc/containerd
+containerd config default | tee /etc/containerd/config.toml
+
+# Set SystemdCgroup = true
+sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
+
+systemctl restart containerd
