@@ -11,6 +11,6 @@ sudo swapoff -a
 
 # Disable swap in /etc/fstab to persist across reboots
 echo "Disabling swap in /etc/fstab..."
-sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+sudo sed -i '/[[:space:]]swap[[:space:]]/ s/^\(.*\)$/#\1/g' /etc/fstab
 
 echo "Swap disabled successfully."
