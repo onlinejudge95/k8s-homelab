@@ -86,11 +86,11 @@ fi
 # First, try to replace false with true if it exists
 sed -i 's/\(SystemdCgroup[[:space:]]*=[[:space:]]*\)false/\1true/g' /etc/containerd/config.toml
 
-# Check if SystemdCgroup exists at all (true or false)
-if ! grep -q 'SystemdCgroup[[:space:]]*=' /etc/containerd/config.toml; then
+# Check if SystemdCgroup exists at all (true or false) in non-commented lines
+if ! grep -q '^[[:space:]]*SystemdCgroup[[:space:]]*=' /etc/containerd/config.toml; then
     # SystemdCgroup is missing, add it in the [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options] section
     if grep -q '\[plugins\."io\.containerd\.grpc\.v1\.cri"\.containerd\.runtimes\.runc\.options\]' /etc/containerd/config.toml; then
-        sed -i '/\[plugins\."io\.containerd\.grpc\.v1\.cri"\.containerd\.runtimes\.runc\.options\]/a\            SystemdCgroup = true' /etc/containerd/config.toml
+        sed -i '/\[plugins\."io\.containerd\.grpc\.v1\.cri"\.containerd\.runtimes\.runc\.options\]/a\    SystemdCgroup = true' /etc/containerd/config.toml
     else
         echo "Error: Could not find the runc options section in /etc/containerd/config.toml to add SystemdCgroup setting."
         exit 1
@@ -98,7 +98,7 @@ if ! grep -q 'SystemdCgroup[[:space:]]*=' /etc/containerd/config.toml; then
 fi
 
 # Final validation that SystemdCgroup is now set to true
-if ! grep -q 'SystemdCgroup[[:space:]]*=[[:space:]]*true' /etc/containerd/config.toml; then
+if ! grep -q '^[[:space:]]*SystemdCgroup[[:space:]]*=[[:space:]]*true' /etc/containerd/config.toml; then
     echo "Error: Failed to enable SystemdCgroup in /etc/containerd/config.toml."
     exit 1
 fi
