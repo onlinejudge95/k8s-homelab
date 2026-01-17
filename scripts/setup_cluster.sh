@@ -24,8 +24,15 @@ overlay
 br_netfilter
 EOF
 
-modprobe overlay
-modprobe br_netfilter
+if ! modprobe overlay; then
+    echo "Error: Failed to load overlay kernel module."
+    exit 1
+fi
+
+if ! modprobe br_netfilter; then
+    echo "Error: Failed to load br_netfilter kernel module."
+    exit 1
+fi
 
 # Set system configurations for Kubernetes networking
 echo "Setting system configurations..."
