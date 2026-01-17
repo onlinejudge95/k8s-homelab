@@ -78,8 +78,13 @@ if ! containerd config default > /etc/containerd/config.toml; then
 fi
 
 # Set SystemdCgroup = true
-sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
+sed -i 's/SystemdCgroup[[:space:]]*=[[:space:]]*false/SystemdCgroup = true/g' /etc/containerd/config.toml
 
+# Validate that SystemdCgroup has been enabled
+if ! grep -q 'SystemdCgroup[[:space:]]*=[[:space:]]*true' /etc/containerd/config.toml; then
+    echo "Error: Failed to enable SystemdCgroup in /etc/containerd/config.toml."
+    exit 1
+fi
 if ! systemctl restart containerd; then
     echo "Error: Failed to restart containerd service."
     exit 1
