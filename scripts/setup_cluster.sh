@@ -48,7 +48,7 @@ sysctl --system
 echo "Kernel modules loaded and system configurations applied."
 
 # Installing containerd
-echo "Installing containerd"
+echo "Installing containerd..."
 
 apt-get update
 apt-get install --assume-yes ca-certificates curl gnupg
