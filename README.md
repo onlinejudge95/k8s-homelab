@@ -10,4 +10,4 @@ This repository contains the application configuration for my local Kubernetes c
 
 ## Structure
 
-- `scripts/`: various helper scripts for automation.
+- `scripts/`: Various helper scripts for automation.
