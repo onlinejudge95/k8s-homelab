@@ -67,3 +67,5 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.
 
 apt-get update
 apt-get install --assume-yes containerd.io
+
+echo "Containerd installed successfully."
