@@ -50,8 +50,7 @@ echo "Kernel modules loaded and system configurations applied."
 # Installing containerd
 echo "Installing containerd..."
 
-apt-get update
-apt-get install --assume-yes ca-certificates curl gnupg
+apt-get update && apt-get install --assume-yes ca-certificates curl gnupg
 install -m 0755 -d /etc/apt/keyrings
 tmp_docker_gpg="$(mktemp)"
 if ! curl -fsSL -o "$tmp_docker_gpg" https://download.docker.com/linux/ubuntu/gpg; then
