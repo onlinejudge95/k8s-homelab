@@ -72,9 +72,14 @@ echo "Containerd installed successfully."
 # Configure containerd for Systemd cgroups
 echo "Configuring containerd..."
 mkdir -p /etc/containerd
-if ! containerd config default > /etc/containerd/config.toml; then
-    echo "Error: Failed to generate default containerd configuration."
-    exit 1
+
+if [ -f /etc/containerd/config.toml ]; then
+    echo "Using existing /etc/containerd/config.toml (will ensure SystemdCgroup is enabled)..."
+else
+    if ! containerd config default > /etc/containerd/config.toml; then
+        echo "Error: Failed to generate default containerd configuration."
+        exit 1
+    fi
 fi
 
 # Set SystemdCgroup = true
