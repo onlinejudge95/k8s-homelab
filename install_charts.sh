@@ -1,13 +1,20 @@
 #!/bin/bash
 set -euo pipefail
 
-install_helm_charts() {
-    local repo_file="$1"
-
+check_dependencies() {
     if ! command -v yq &> /dev/null; then
         echo "Error: yq is not installed."
         exit 1
     fi
+
+    if ! command -v helm &> /dev/null; then
+        echo "Error: helm is not installed."
+        exit 1
+    fi
+}
+
+install_helm_charts() {
+    local repo_file="$1"
 
     if [ ! -f "$repo_file" ]; then
         echo "Error: $repo_file not found."
@@ -44,4 +51,5 @@ install_helm_charts() {
     done
 }
 
+check_dependencies
 install_helm_charts "./repos.yml"

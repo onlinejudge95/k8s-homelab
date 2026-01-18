@@ -8,6 +8,14 @@ This repository contains the application configuration for my local Kubernetes c
 - `helm` installed.
 - `yq` installed.
 
+## Usage
+
+1. Configure your repositories and charts in `repos.yml`.
+2. Run the installation script:
+   ```bash
+   ./install_charts.sh
+   ```
+
 ## Configuration
 
 ### repos.yml

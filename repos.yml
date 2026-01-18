@@ -5,4 +5,3 @@ repos:
     release_name: "cilium"
     namespace: "kube-system"
     values: "./values/cilium.yaml"
-    
