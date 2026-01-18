@@ -43,3 +43,19 @@ repos:
     namespace: "kube-system"
     values: "./values/cilium.yaml"
 ```
+
+### L2 Announcement Pool
+
+To configure L2 announcements for Cilium, apply the IP Pool manifest:
+
+```bash
+kubectl apply --filename manifests/pool.yml
+```
+
+### L2 Announcement Policy
+
+To configure the announcement policy for services (who announces what IPs), apply the Policy manifest:
+
+```bash
+kubectl apply --filename manifests/policy.yml
+```
