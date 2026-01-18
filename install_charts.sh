@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 install_helm_charts() {
     local repo_file="$1"
