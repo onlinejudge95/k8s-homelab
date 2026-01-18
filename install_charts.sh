@@ -28,18 +28,18 @@ install_helm_charts() {
     yq -r '.repos[] | select(.chart != null) | [.name, .chart, .release_name, .namespace, .values] | @tsv' "$repo_file" | while IFS=$'\t' read -r repo_name chart release_name namespace values_file; do
         echo "Processing $release_name ($chart)..."
         
-        cmd="helm upgrade --install $release_name $chart --namespace $namespace --create-namespace"
+        cmd=(helm upgrade --install "$release_name" "$chart" --namespace "$namespace" --create-namespace)
         
         if [ -n "$values_file" ] && [ "$values_file" != "null" ]; then
              if [ -f "$values_file" ]; then
-                cmd="$cmd -f $values_file"
+                cmd+=(-f "$values_file")
              else
                 echo "Warning: Values file $values_file not found for $release_name. Skipping values file."
              fi
         fi
 
-        echo "Running: $cmd"
-        eval "$cmd"
+        echo "Running: ${cmd[*]}"
+        "${cmd[@]}"
     done
 }
 
