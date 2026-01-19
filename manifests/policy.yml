@@ -1,18 +1,13 @@
+---
 apiVersion: "cilium.io/v2alpha1"
 kind: CiliumL2AnnouncementPolicy
 metadata:
   name: "default-l2-policy"
 spec:
-  # Which services should be announced? (Empty matches all LoadBalancer services)
   serviceSelector:
     matchLabels: {}
-
-  # Which nodes should perform the announcement? (Empty matches all nodes)
   nodeSelector:
     matchLabels: {}
-
-  # Which network interfaces should announce the IP? (Regex)
-  # If omitted, defaults to all external-facing interfaces.
   interfaces:
     - ^eth[0-9]+
   loadBalancerIPs: true
