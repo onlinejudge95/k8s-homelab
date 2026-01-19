@@ -2,5 +2,5 @@ extends: default
 
 rules:
   line-length: disable
-  check-keys: disable
+  key-duplicates: disable
   truthy: disable
