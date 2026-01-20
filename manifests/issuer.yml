@@ -6,13 +6,12 @@ metadata:
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
-    email: onlinejudge95@gmail.com
+    email: "${ACME_EMAIL}"
     privateKeySecretRef:
       name: letsencrypt-prod-account-key
     solvers:
       - dns01:
           cloudflare:
-            email: onlinejudge95@gmail.com
             apiTokenSecretRef:
               name: cloudflare-api-token-secret
               key: api-token
