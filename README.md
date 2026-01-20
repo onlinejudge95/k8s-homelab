@@ -69,7 +69,14 @@ To configure the ClusterIssuer for cert-manager, you need to provide your email 
     export ACME_EMAIL=your-email@example.com
     ```
 
-2.  Apply the manifest using `envsubst`:
+2.  Create the Cloudflare API token secret in the `cert-manager` namespace:
+    ```bash
+    kubectl create secret generic cloudflare-api-token-secret \
+      --from-literal=api-token=YOUR_CLOUDFLARE_API_TOKEN \
+      --namespace cert-manager
+    ```
+
+3.  Apply the manifest using `envsubst`:
     ```bash
     envsubst < manifests/issuer.yml | kubectl apply -f -
     ```
