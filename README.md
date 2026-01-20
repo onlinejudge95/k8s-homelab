@@ -13,8 +13,11 @@ This repository contains the application configuration for my local Kubernetes c
 1. Configure your repositories and charts in `repos.yml`.
 2. Run the installation script:
    ```bash
-   ./install_charts.sh
+   ```bash
+   ./install_charts.sh [release_name]
    ```
+   
+   If `release_name` is provided, only that specific chart will be processed. Otherwise, all charts in `repos.yml` will be installed/upgraded.
 
 ## Configuration
 

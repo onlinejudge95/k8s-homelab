@@ -15,6 +15,7 @@ check_dependencies() {
 
 install_helm_charts() {
     local repo_file="$1"
+    local target_release="${2:-}"
 
     if [ ! -f "$repo_file" ]; then
         echo "Error: $repo_file not found."
@@ -34,6 +35,10 @@ install_helm_charts() {
     # Install charts
     echo "Installing/Upgrading charts..."
     yq -r '.repos[] | select(.chart != null) | [.name, .chart, .release_name, .namespace, .values] | @tsv' "$repo_file" | while IFS=$'\t' read -r repo_name chart release_name namespace values_file; do
+        if [ -n "$target_release" ] && [ "$release_name" != "$target_release" ]; then
+            continue
+        fi
+
         echo "Processing $release_name ($chart)..."
         
         cmd=(helm upgrade --install "$release_name" "$chart" --namespace "$namespace" --create-namespace)
@@ -52,4 +57,4 @@ install_helm_charts() {
 }
 
 check_dependencies
-install_helm_charts "./repos.yml"
+install_helm_charts "./repos.yml" "${1:-}"
