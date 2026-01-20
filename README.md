@@ -83,3 +83,28 @@ To configure the ClusterIssuer for cert-manager, first ensure that cert-manager 
     ```bash
     envsubst < manifests/issuer.yml | kubectl apply -f -
     ```
+
+### Postgres
+
+To install Postgres, run the following command:
+
+```bash
+./install_charts.sh postgres
+```
+
+This will install the Bitnami Postgres chart in the `postgres` namespace. Default credentials are automatically generated and stored in a Kubernetes Secret.
+
+To retrieve the password for the `postgres` user:
+
+```bash
+kubectl get secret --namespace postgres postgres-secret -o jsonpath="{.data.postgres-password}" | base64 -d
+```
+
+To connect to the database using a temporary client pod:
+
+```bash
+kubectl run pg-client --rm --tty -i --restart='Never' --namespace postgres \
+  --image docker.io/bitnami/postgresql:16-debian-12 \
+  --env="PGPASSWORD=$(kubectl get secret --namespace postgres postgres-secret -o jsonpath="{.data.postgres-password}" | base64 -d)" \
+  --command -- psql --host postgres-postgresql -U postgres -d postgres -p 5432
+```
