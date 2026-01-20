@@ -59,3 +59,24 @@ To configure the announcement policy for services (who announces what IPs), appl
 ```bash
 kubectl apply --filename manifests/policy.yml
 ```
+
+### Cert Manager Issuer
+
+To configure the ClusterIssuer for cert-manager, first ensure that cert-manager has been installed successfully via `./install_charts.sh` (as defined in `repos.yml`), then provide your email address for Let's Encrypt registration.
+
+1.  Export your email address:
+    ```bash
+    export ACME_EMAIL=your-email@example.com
+    ```
+
+2.  Create the Cloudflare API token secret in the `cert-manager` namespace:
+    ```bash
+    kubectl create secret generic cloudflare-api-token-secret \
+      --from-literal=api-token=YOUR_CLOUDFLARE_API_TOKEN \
+      --namespace cert-manager
+    ```
+
+3.  Apply the manifest using `envsubst`:
+    ```bash
+    envsubst < manifests/issuer.yml | kubectl apply -f -
+    ```
