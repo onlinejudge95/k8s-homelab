@@ -175,6 +175,10 @@ configmap:
   teardown: |-
     #!/bin/sh
     set -eu
+    # WARNING: This will recursively and permanently delete all data under "$VOL_DIR".
+    # Use this teardown script only when the StorageClass reclaimPolicy is set to "Delete"
+    # and you fully understand the data loss implications. Ensure that "$VOL_DIR" points
+    # only to the intended volume path and not to any shared or critical host directories.
     rm -rf "$VOL_DIR"
   helperPod:
     # Allows to run the helper pod in another namespace. Uses release namespace by default.
