@@ -62,7 +62,7 @@ kubectl apply --filename manifests/policy.yml
 
 ### Cert Manager Issuer
 
-To configure the ClusterIssuer for cert-manager, you need to provide your email address for Let's Encrypt registration.
+To configure the ClusterIssuer for cert-manager, first ensure that cert-manager has been installed successfully via `./install_charts.sh` (as defined in `repos.yml`), then provide your email address for Let's Encrypt registration.
 
 1.  Export your email address:
     ```bash
