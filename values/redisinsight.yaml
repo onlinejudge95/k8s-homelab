@@ -61,8 +61,8 @@ ingress:
         - /
   tls:
     - secretName: redisinsight-tls
-     hosts:
-       - homelab.courtroom.cloud
+      hosts:
+        - homelab.courtroom.cloud
 
 resources:
   limits:
