@@ -1,0 +1,107 @@
+# Default values for redisinsight-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+nameOverride: ""
+fullnameOverride: ""
+
+# Number of pods in replicaset
+replicaCount: 1
+
+image:
+  repository: heywood8/redisinsight
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+# Set imagePullSecret if you use image from private repository
+imagePullSecrets: []
+
+# Recreate | RollingUpdate
+updateStrategy: Recreate
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+  automountServiceAccountToken: false
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 65534
+  runAsUser: 1000
+
+securityContext:
+  capabilities:
+    add:
+    - IPC_LOCK
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 5000
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: cilium
+    kubernetes.io/tls-acme: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  pathType: Prefix
+  hosts:
+    - host: homelab.courtroom.cloud
+      paths:
+        - /
+  tls:
+   - secretName: redisinsight-tls
+     hosts:
+       - homelab.courtroom.cloud
+
+resources:
+  limits:
+    memory: 300Mi
+  requests:
+    cpu: 1m
+    memory: 200Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# For redisinsight versions < 2 set the same as ingress
+trustedOrigins: ''
+
+persistentVolumeClaim:
+  create: false
+  accessMode: ReadWriteOnce
+  storageClassName: ''
+  # Small storage should do
+  storage: 64Mi
+
+# This also sets env var APP_FOLDER_ABSOLUTE_PATH
+volumeMount:
+  # Set to /db/ for redisinsight versions < 2
+  mountPath: /redisinsight/
+
+livenessProbe:
+  tcpSocket:
+    port: http
+  periodSeconds: 10
+  failureThreshold: 2
+
+readinessProbe:
+  tcpSocket:
+    port: http
+  initialDelaySeconds: 15
+  periodSeconds: 10
+  failureThreshold: 2
+
