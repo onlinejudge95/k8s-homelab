@@ -60,7 +60,7 @@ ingress:
       paths:
         - /
   tls:
-   - secretName: redisinsight-tls
+    - secretName: redisinsight-tls
      hosts:
        - homelab.courtroom.cloud
 
