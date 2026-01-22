@@ -53,13 +53,13 @@ ingress:
     cert-manager.io/cluster-issuer: letsencrypt-prod
   pathType: Prefix
   hosts:
-    - host: homelab.courtroom.cloud
+    - host: redisinsight.homelab.courtroom.cloud
       paths:
         - /
   tls:
     - secretName: redisinsight-tls
       hosts:
-        - homelab.courtroom.cloud
+        - redisinsight.homelab.courtroom.cloud
 
 resources:
   limits:
@@ -75,7 +75,7 @@ tolerations: []
 affinity: {}
 
 # For redisinsight versions < 2 set the same as ingress
-trustedOrigins: "https://homelab.courtroom.cloud"
+trustedOrigins: "https://redisinsight.homelab.courtroom.cloud"
 
 persistentVolumeClaim:
   create: true
