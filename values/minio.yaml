@@ -467,7 +467,7 @@ makeBucketJob:
 
 ## List of command to run after minio install
 ## NOTE: the mc command TARGET is always "myminio"
-customCommands:
+customCommands: []
   # - command: "admin policy attach myminio consoleAdmin --group='cn=ops,cn=groups,dc=example,dc=com'"
 
 ## Additional Annotations for the Kubernetes Job customCommandJob
