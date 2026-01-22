@@ -38,9 +38,6 @@ podSecurityContext:
   runAsUser: 1000
 
 securityContext:
-  capabilities:
-    add:
-    - IPC_LOCK
   runAsNonRoot: true
   runAsUser: 1000
 
@@ -78,10 +75,10 @@ tolerations: []
 affinity: {}
 
 # For redisinsight versions < 2 set the same as ingress
-trustedOrigins: ''
+trustedOrigins: "https://homelab.courtroom.cloud"
 
 persistentVolumeClaim:
-  create: false
+  create: true
   accessMode: ReadWriteOnce
   storageClassName: ''
   # Small storage should do
