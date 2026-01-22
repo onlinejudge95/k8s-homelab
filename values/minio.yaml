@@ -359,20 +359,24 @@ makePolicyJob:
 
 ## List of users to be created after minio install
 ##
-users:
-  ## Username, password and policy to be assigned to the user
+users: []
+  ## To create users automatically, provide a list here or in your own values file.
+  ## Do NOT use hardcoded, shared, or weak credentials.
   ## Default policies are [readonly|readwrite|writeonly|consoleAdmin|diagnostics]
   ## Add new policies as explained here https://min.io/docs/minio/kubernetes/upstream/administration/identity-access-management.html#access-management
   ## NOTE: this will fail if LDAP is enabled in your MinIO deployment
   ## make sure to disable this if you are using LDAP.
-  - accessKey: console
-    secretKey: console123
-    policy: consoleAdmin
-  # Or you can refer to specific secret
-  #- accessKey: externalSecret
-  #  existingSecret: my-secret
-  #  existingSecretKey: password
-  #  policy: readonly
+  ##
+  ## Example (uncomment and change values before use):
+  ## - accessKey: "CHANGE_ME_ACCESS_KEY"
+  ##   secretKey: "CHANGE_ME_SECRET_KEY"
+  ##   policy: consoleAdmin
+  ##
+  ## Or you can refer to a specific existing Kubernetes Secret:
+  ## - accessKey: externalUser
+  ##   existingSecret: my-secret
+  ##   existingSecretKey: password
+  ##   policy: readonly
 
 ## Additional Annotations for the Kubernetes Job makeUserJob
 makeUserJob:
