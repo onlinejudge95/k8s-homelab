@@ -6,9 +6,11 @@ metadata:
   namespace: cnpg
 spec:
   instances: 1
+
   storage:
     size: 10Gi
     storageClass: local-path
+
   resources:
     requests:
       memory: "512Mi"

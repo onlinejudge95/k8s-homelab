@@ -83,3 +83,60 @@ To configure the ClusterIssuer for cert-manager, first ensure that cert-manager 
     ```bash
     envsubst < manifests/issuer.yml | kubectl apply -f -
     ```
+
+### PostgreSQL Cluster with Hybrid TLS
+
+The PostgreSQL cluster uses a **hybrid TLS approach** for security:
+
+- **Internal TLS**: CloudNativePG operator-managed self-signed certificates (automatic, rotated every 90 days)
+- **External TLS**: LoadBalancer service with public DNS for external access
+
+#### Architecture
+
+```
+External Client
+      ↓
+LoadBalancer (192.168.1.202) → postgres.homelab.courtroom.cloud
+      ↓ (TLS: operator-managed)
+PostgreSQL Cluster (postgres-rw service)
+```
+
+#### Setup Steps
+
+1.  Ensure the CNPG operator is installed via `./install_charts.sh`.
+
+2.  Apply the PostgreSQL cluster manifest:
+    ```bash
+    kubectl apply -f manifests/cluster.yml
+    ```
+
+3.  Apply the LoadBalancer service for external access:
+    ```bash
+    kubectl apply -f manifests/postgres-lb.yml
+    ```
+
+4.  Configure DNS to point `postgres.homelab.courtroom.cloud` to the LoadBalancer external IP:
+    ```bash
+    kubectl get svc postgres-lb -n cnpg -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    ```
+
+#### Connecting to PostgreSQL
+
+**Internal connections** (from within the cluster):
+```bash
+psql "sslmode=require host=postgres-rw.cnpg.svc.cluster.local port=5432 user=app dbname=app"
+```
+
+**External connections** (via LoadBalancer):
+```bash
+psql "sslmode=require host=postgres.homelab.courtroom.cloud port=5432 user=app dbname=app"
+```
+
+**Note**: The operator-managed certificates are self-signed. For external connections, you may need to use `sslmode=require` instead of `sslmode=verify-full` unless you import the CA certificate.
+
+#### TLS Certificate Management
+
+- **Server certificates**: Automatically managed by CloudNativePG operator
+- **Rotation**: Automatic every 90 days
+- **CA certificate**: Available in the `postgres-ca` secret in the `cnpg` namespace
+- **No manual intervention required**

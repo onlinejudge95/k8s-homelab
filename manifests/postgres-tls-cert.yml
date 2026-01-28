@@ -1,0 +1,30 @@
+---
+# Certificate resource for PostgreSQL external access
+# Note: This certificate is kept for potential future ingress/proxy use
+# PostgreSQL server itself uses operator-managed certificates
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: postgres-server-cert
+  namespace: cnpg
+spec:
+  secretName: postgres-server-cert
+  # Use secretTemplate to add the reload label
+  secretTemplate:
+    labels:
+      cnpg.io/reload: ""
+  duration: 2160h # 90 days
+  renewBefore: 720h # 30 days
+  usages:
+    - server auth
+    - digital signature
+    - key encipherment
+  dnsNames:
+    # External access via public DNS
+    # Note: Let's Encrypt cannot issue certificates for internal cluster DNS names
+    # PostgreSQL will use this certificate for all connections
+    - postgres.homelab.courtroom.cloud
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+    group: cert-manager.io
