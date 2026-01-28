@@ -1,0 +1,30 @@
+---
+# LoadBalancer Service for external PostgreSQL access
+# This service provides external access to PostgreSQL via an external/LAN IP
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-lb
+  namespace: cnpg
+  annotations:
+    # External DNS annotation to create DNS record
+    external-dns.alpha.kubernetes.io/hostname: postgres.homelab.courtroom.cloud
+spec:
+  type: LoadBalancer
+  # Restrict access to trusted networks only
+  # IMPORTANT: Adjust these ranges to match your trusted networks
+  loadBalancerSourceRanges:
+    - 192.168.1.0/24    # Home LAN - adjust to your network
+    # - 10.0.0.0/8      # Add VPN range if applicable
+    # - YOUR_EXTERNAL_IP/32  # Add your external IP if needed
+  selector:
+    # Select the PostgreSQL primary pod
+    cnpg.io/cluster: postgres
+    role: primary
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+      protocol: TCP
+  # Preserve client source IP
+  externalTrafficPolicy: Local
