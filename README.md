@@ -96,7 +96,7 @@ The PostgreSQL cluster uses a **hybrid TLS approach** for security:
 ```
 External Client
       ↓
-LoadBalancer (192.168.1.202) → postgres.homelab.courtroom.cloud
+LoadBalancer (<LOADBALANCER_EXTERNAL_IP>) → postgres.homelab.courtroom.cloud
       ↓ (TLS: operator-managed)
 PostgreSQL Cluster (postgres-rw service)
 ```
