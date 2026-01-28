@@ -83,12 +83,9 @@ To configure the ClusterIssuer for cert-manager, first ensure that cert-manager 
     envsubst < manifests/issuer.yml | kubectl apply -f -
     ```
 
-### PostgreSQL Cluster with Hybrid TLS
+### PostgreSQL Cluster with TLS
 
-The PostgreSQL cluster uses a **hybrid TLS approach** for security:
-
-- **Internal TLS**: CloudNativePG operator-managed self-signed certificates (automatic, rotated every 90 days)
-- **External TLS**: LoadBalancer service with public DNS for external access
+The PostgreSQL cluster uses **operator-managed self-signed TLS certificates** for all connections (both internal and external).
 
 #### Architecture
 
@@ -98,7 +95,12 @@ External Client
 LoadBalancer (<LOADBALANCER_EXTERNAL_IP>) → postgres.homelab.courtroom.cloud
       ↓ (TLS: operator-managed)
 PostgreSQL Cluster (postgres-rw service)
+      ↓ DNS: postgres.homelab.courtroom.cloud
+PostgreSQL Server
+      └─ TLS: Self-signed certificates (operator-managed)
 ```
+
+**Important**: The LoadBalancer does **NOT** terminate TLS. It simply forwards TCP traffic to PostgreSQL, which uses self-signed certificates.
 
 #### Setup Steps
 
@@ -118,6 +120,7 @@ PostgreSQL Cluster (postgres-rw service)
     ```bash
     kubectl get svc postgres-lb -n cnpg -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
     ```
+    Add an A record in Cloudflare: `postgres.homelab` → `192.168.1.202` (DNS only, no proxy)
 
 #### Connecting to PostgreSQL
 
@@ -131,11 +134,47 @@ psql "sslmode=require host=postgres-rw.cnpg.svc.cluster.local port=5432 user=app
 psql "sslmode=require host=postgres.homelab.courtroom.cloud port=5432 user=app dbname=app"
 ```
 
-**Note**: The operator-managed certificates are self-signed. For external connections, you may need to use `sslmode=require` instead of `sslmode=verify-full` unless you import the CA certificate.
+#### SSL Mode Options
+
+Since PostgreSQL uses **self-signed certificates**, SSL mode options are limited:
+
+| SSL Mode | Works? | Description |
+|----------|--------|-------------|
+| `sslmode=disable` | ✅ | No encryption (not recommended) |
+| `sslmode=require` | ✅ | **Recommended** - Encrypts connection, doesn't verify certificate |
+| `sslmode=verify-ca` | ⚠️ | Requires importing CA certificate (see below) |
+| `sslmode=verify-full` | ❌ | **Won't work** - Certificate CN doesn't match `postgres.homelab.courtroom.cloud` |
+
+**Why `verify-full` doesn't work**: The operator-managed certificate has CN=`postgres-rw` (internal service name), not the external DNS name. To use `verify-full`, you would need to configure CNPG with a custom certificate that includes the external DNS name as a SAN.
+
+#### Using `verify-ca` Mode (Optional)
+
+If you want to verify the CA certificate without hostname verification:
+
+```bash
+# Extract the CA certificate
+kubectl get secret postgres-ca -n cnpg -o jsonpath='{.data.ca\.crt}' | base64 -d > ~/postgres-ca.crt
+
+# Connect with CA verification
+psql "sslmode=verify-ca sslrootcert=$HOME/postgres-ca.crt host=postgres.homelab.courtroom.cloud port=5432 user=app dbname=app"
+```
 
 #### TLS Certificate Management
 
 - **Server certificates**: Automatically managed by CloudNativePG operator
+- **Type**: Self-signed (not publicly trusted)
 - **Rotation**: Automatic every 90 days
 - **CA certificate**: Available in the `postgres-ca` secret in the `cnpg` namespace
 - **No manual intervention required**
+
+#### Enabling Full Certificate Verification (Advanced)
+
+To enable `sslmode=verify-full` with the external DNS name, you would need to:
+
+1. Create a custom certificate with SAN: `postgres.homelab.courtroom.cloud`
+2. Configure CNPG to use it via `certificates.serverTLSSecret` and `certificates.serverCASecret`
+3. Use either:
+   - Self-signed certificate via cert-manager (works but still not publicly trusted)
+   - TLS-terminating proxy/ingress with Let's Encrypt (adds complexity)
+
+The current setup prioritizes **simplicity and automatic management** over full certificate verification.
