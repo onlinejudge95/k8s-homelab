@@ -1,6 +1,6 @@
 ---
 # LoadBalancer Service for external PostgreSQL access
-# This service provides external access to PostgreSQL with a public IP
+# This service provides external access to PostgreSQL via an external/LAN IP
 apiVersion: v1
 kind: Service
 metadata:
