@@ -13,7 +13,6 @@ This repository contains the application configuration for my local Kubernetes c
 1. Configure your repositories and charts in `repos.yml`.
 2. Run the installation script:
    ```bash
-   ```bash
    ./install_charts.sh [release_name]
    ```
    
