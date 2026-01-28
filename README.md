@@ -123,7 +123,7 @@ PostgreSQL Server
     ```bash
     kubectl get svc postgres-lb -n cnpg -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
     ```
-    Add an A record in Cloudflare: `postgres.homelab` → `192.168.1.202` (DNS only, no proxy)
+    In the `courtroom.cloud` zone in Cloudflare, add an A record with name `postgres.homelab` (FQDN `postgres.homelab.courtroom.cloud`) pointing to the LoadBalancer IP (for example, `192.168.1.202`, DNS only, no proxy).
 
 #### Connecting to PostgreSQL
 
