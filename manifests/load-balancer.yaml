@@ -23,9 +23,9 @@ spec:
     role: primary
   ports:
     - name: postgres
-    port: 5432
-    targetPort: 5432
-    protocol: TCP
+      port: 5432
+      targetPort: 5432
+      protocol: TCP
   # Preserve client source IP
   externalTrafficPolicy: Local
 ---

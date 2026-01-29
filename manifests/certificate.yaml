@@ -1,3 +1,4 @@
+---
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -5,8 +6,8 @@ metadata:
   namespace: redis
 spec:
   secretName: redis-tls
-  duration: 2160h # 90 days
-  renewBefore: 720h # 30 days
+  duration: 2160h
+  renewBefore: 720h
   dnsNames:
     - redis.homelab.courtroom.cloud
   issuerRef:
