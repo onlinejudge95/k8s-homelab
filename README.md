@@ -111,13 +111,13 @@ PostgreSQL Server
     kubectl apply -f manifests/cluster.yml
     ```
 
-3.  Apply the LoadBalancer service for external access:
+3.  Apply the LoadBalancer service for external access (PostgreSQL and Redis):
     ```bash
-    kubectl apply -f manifests/postgres-lb.yml
+    kubectl apply -f manifests/load-balancer.yaml
     ```
     
     > [!IMPORTANT]
-    > The LoadBalancer is configured with `loadBalancerSourceRanges` to restrict access to `192.168.1.0/24` (your home LAN). Adjust this range in `manifests/postgres-lb.yml` to match your trusted networks before applying.
+    > The LoadBalancer is configured with `loadBalancerSourceRanges` to restrict access to `192.168.1.0/24` (your home LAN). Adjust this range in `manifests/load-balancer.yaml` to match your trusted networks before applying.
 
 4.  Configure DNS to point `postgres.homelab.courtroom.cloud` to the LoadBalancer external IP:
     ```bash
@@ -181,3 +181,71 @@ To enable `sslmode=verify-full` with the external DNS name, you would need to:
    - TLS-terminating proxy/ingress with Let's Encrypt (adds complexity)
 
 The current setup prioritizes **simplicity and automatic management** over full certificate verification.
+
+### Redis with TLS
+
+Redis is configured with **Let's Encrypt TLS certificates** for secure external access.
+
+#### Architecture
+
+```
+External Client (redis-cli --tls)
+      ↓
+LoadBalancer (<LOADBALANCER_EXTERNAL_IP>) → redis.homelab.courtroom.cloud
+      ↓ (TLS: Passthrough)
+Redis Pod (redis-0)
+      └─ TLS: Let's Encrypt Certificate (/certs/tls.crt)
+```
+
+#### Setup Steps
+
+1.  **Generate the Certificate**:
+    Apply the certificate manifest to request a Let's Encrypt certificate for `redis.homelab.courtroom.cloud`. This will create the `redis-tls` secret.
+    ```bash
+    kubectl apply -f manifests/certificate.yaml
+    ```
+
+2.  **Deploy Redis**:
+    Ensure Redis is installed via `./install_charts.sh`. The chart is configured to use the `redis-tls` secret created in the previous step.
+
+3.  **Apply LoadBalancer**:
+    (If not already done)
+    ```bash
+    kubectl apply -f manifests/load-balancer.yaml
+    ```
+
+4.  **Configure DNS**:
+    Get the LoadBalancer IP for Redis:
+    ```bash
+    kubectl get svc redis-lb -n redis -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    ```
+    In Cloudflare (or your DNS provider), add an **A record** for `redis.homelab` pointing to this IP. Ensure it is **DNS Only** (Gray cloud), not proxied.
+
+#### Connecting to Redis
+
+**Get the Password**:
+```bash
+export REDIS_PASSWORD=$(kubectl get secret redis-secret -n redis -o jsonpath="{.data.password}" | base64 -d)
+```
+
+**External Connection** (Secure):
+```bash
+redis-cli --tls \
+  -h redis.homelab.courtroom.cloud \
+  -p 6379 \
+  -a $REDIS_PASSWORD \
+  ping
+```
+
+**Internal Connection** (From within cluster):
+Note: Use `CERT_NONE` or `--insecure` because the internal hostname (`redis.redis.svc...`) does not match the public certificate.
+```bash
+kubectl run redis-test --rm -it --restart=Never \
+  --image=redis:7.2.4 \
+  --env REDIS_PASSWORD=$REDIS_PASSWORD \
+  --command -- redis-cli --tls --insecure \
+  -h redis.homelab.courtroom.cloud \
+  -p 6379 \
+  -a $REDIS_PASSWORD \
+  ping
+```
