@@ -65,6 +65,16 @@ service:
   # Annotations for the service
   annotations: {}
 
+# TLS configuration
+tls:
+  enabled: true
+  authClients: false
+  existingSecret: "redis-tls"
+  hostname: "redis.homelab.courtroom.cloud"
+  certFilename: "tls.crt"
+  keyFilename: "tls.key"
+  caCertFilename: ""
+
 # Authentication configuration
 auth:
   # Enable password authentication

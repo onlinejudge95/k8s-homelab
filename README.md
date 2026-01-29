@@ -111,13 +111,13 @@ PostgreSQL Server
     kubectl apply -f manifests/cluster.yml
     ```
 
-3.  Apply the LoadBalancer service for external access:
+3.  Apply the LoadBalancer service for external access (PostgreSQL and Redis):
     ```bash
-    kubectl apply -f manifests/postgres-lb.yml
+    kubectl apply -f manifests/load-balancer.yaml
     ```
     
     > [!IMPORTANT]
-    > The LoadBalancer is configured with `loadBalancerSourceRanges` to restrict access to `192.168.1.0/24` (your home LAN). Adjust this range in `manifests/postgres-lb.yml` to match your trusted networks before applying.
+    > The LoadBalancer is configured with `loadBalancerSourceRanges` to restrict access to `192.168.1.0/24` (your home LAN). Adjust this range in `manifests/load-balancer.yaml` to match your trusted networks before applying.
 
 4.  Configure DNS to point `postgres.homelab.courtroom.cloud` to the LoadBalancer external IP:
     ```bash

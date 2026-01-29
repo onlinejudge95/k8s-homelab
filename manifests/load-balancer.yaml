@@ -23,8 +23,33 @@ spec:
     role: primary
   ports:
     - name: postgres
-      port: 5432
-      targetPort: 5432
-      protocol: TCP
+    port: 5432
+    targetPort: 5432
+    protocol: TCP
   # Preserve client source IP
+  externalTrafficPolicy: Local
+---
+# LoadBalancer Service for Redis external access
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-lb
+  namespace: redis
+  annotations:
+    # External DNS annotation to create DNS record
+    external-dns.alpha.kubernetes.io/hostname: redis.homelab.courtroom.cloud
+spec:
+  type: LoadBalancer
+  # Restrict access to trusted networks only (same as Postgres)
+  loadBalancerSourceRanges:
+    - 192.168.1.0/24    # Home LAN
+    # - YOUR_EXTERNAL_IP/32
+  selector:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/instance: redis
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: 6379
+      protocol: TCP
   externalTrafficPolicy: Local
